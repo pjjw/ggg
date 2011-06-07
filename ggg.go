@@ -72,7 +72,7 @@ var ganglia_addr = flag.String("ganglia_addr", "localhost:8649", "ganglia addres
 var carbon_addr = flag.String("carbon_addr", "localhost:2003", "carbon address")
 var metric_prefix = flag.String("prefix", "ggg.", "prefix for metric names")
 
-func ReadXmlFromFile(in io.Reader) (gmeta GangliaXml, err os.Error) {
+func readXmlFromFile(in io.Reader) (gmeta GangliaXml, err os.Error) {
   p := xml.NewParser(in)
   p.CharsetReader = CharsetReader
 
@@ -88,12 +88,12 @@ func graphiteStringMap(rune int) (ret int) {
   return
 }
 
-func PrintClusterMetrics(out io.Writer, cl *Cluster, ret chan int) {
+func printClusterMetrics(out io.Writer, cl *Cluster, ret chan int) {
   ch := make(chan int)
   log.Print("Reading hosts")
   for _,hst := range cl.Host {
     log.Printf("Reading host %s", hst.Name)
-    go PrintHostMetrics(out, hst, ch)
+    go printHostMetrics(out, hst, ch)
   }
   for _ = range cl.Host {
     <-ch
@@ -101,11 +101,11 @@ func PrintClusterMetrics(out io.Writer, cl *Cluster, ret chan int) {
   ret <- 1
 }
 
-func PrintHostMetrics(out io.Writer, h Host, ret chan int) {
+func printHostMetrics(out io.Writer, h Host, ret chan int) {
   ch := make(chan int)
   log.Printf("Reading %s metrics", h.Name)
   for _,m := range h.Metric {
-    go PrintMetric(out, strings.Map(graphiteStringMap, h.Name), m, ch)
+    go printMetric(out, strings.Map(graphiteStringMap, h.Name), m, ch)
   }
   // drain the channel
   for _ = range h.Metric {
@@ -114,7 +114,7 @@ func PrintHostMetrics(out io.Writer, h Host, ret chan int) {
   ret <- 1
 }
 
-func PrintMetric(out io.Writer, host string, m Metric, ret chan int) {
+func printMetric(out io.Writer, host string, m Metric, ret chan int) {
   if m.Type != "string" {
     fmt.Fprintf(out, "%s%s.%s %s %d\n", *metric_prefix, host, m.Name, m.Val, time.Seconds())
   }
@@ -139,7 +139,7 @@ func main () {
   defer carbon_conn.Close()
 
   // read xml into memory
-  gmeta,err := ReadXmlFromFile(ganglia_conn)
+  gmeta,err := readXmlFromFile(ganglia_conn)
   if err != nil {
     log.Fatal("xml.unmarshal: ", err)
   }
@@ -150,12 +150,12 @@ func main () {
   for _,cl := range gmeta.Cluster {
     log.Print("Reading clusters")
     /* log.Printf("Cluster %s: %#v\n", cl.Name, cl)*/
-    go PrintClusterMetrics(carbon_conn, &cl, c)
+    go printClusterMetrics(carbon_conn, &cl, c)
   }
 
   for _,gr := range gmeta.Grid {
     for _,cl := range gr.Cluster {
-      go PrintClusterMetrics(carbon_conn, &cl, c)
+      go printClusterMetrics(carbon_conn, &cl, c)
     }
     // drain the channel for last grid
     for _ = range gr.Cluster {
