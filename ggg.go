@@ -124,7 +124,7 @@ func main () {
   defer ganglia_conn.Close()
 
   // open connection to carbon-agent
-  carbon_conn,err := net.Dial("udp", *carbon_addr)
+  carbon_conn,err := net.Dial("tcp", *carbon_addr)
   if err != nil {
     log.Fatal("Dial: ", err)
   }
