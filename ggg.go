@@ -9,7 +9,6 @@ import (
   "flag"
   "net"
   "time"
-  "go-charset.googlecode.com/hg/charset"
 )
 
 type GangliaXml struct {
@@ -74,7 +73,7 @@ var xml_file = flag.String("xml_file", "gmond.xml", "xml file to parse")
 
 func ReadXmlFromFile(in io.Reader) (gmeta GangliaXml, err os.Error) {
   p := xml.NewParser(in)
-  p.CharsetReader = charset.NewReader
+  p.CharsetReader = CharsetReader
 
   gmeta = GangliaXml{}
   err = p.Unmarshal(&gmeta, nil)
