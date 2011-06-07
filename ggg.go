@@ -69,7 +69,7 @@ type ExtraElement struct {
 
 var ganglia_addr = flag.String("ganglia_addr", "localhost:8649", "ganglia address")
 var carbon_addr = flag.String("carbon_addr", "localhost:2003", "carbon address")
-var xml_file = flag.String("xml_file", "gmond.xml", "xml file to parse")
+var metric_prefix = flag.String("prefix", "ggg.", "prefix for metric names")
 
 func ReadXmlFromFile(in io.Reader) (gmeta GangliaXml, err os.Error) {
   p := xml.NewParser(in)
@@ -108,7 +108,7 @@ func PrintHostMetrics(out io.Writer, h Host, ret chan int) {
 
 func PrintMetric(out io.Writer, host string, m Metric, ret chan int) {
   if m.Type != "string" {
-    fmt.Fprintf(out, "%s.%s %s %d\n", host, m.Name, m.Val, time.Seconds())
+    fmt.Fprintf(out, "%s%s.%s %s %d\n", *metric_prefix, host, m.Name, m.Val, time.Seconds())
   }
   ret <- 1
 }
