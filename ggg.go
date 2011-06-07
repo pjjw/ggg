@@ -72,19 +72,24 @@ var ganglia_addr = flag.String("ganglia_addr", "localhost:8649", "ganglia addres
 var carbon_addr = flag.String("carbon_addr", "localhost:2003", "carbon address")
 var metric_prefix = flag.String("prefix", "ggg.", "prefix for metric names")
 
+var runeMap = map[int]int {
+  46: 95, // '.' -> '_'
+}
+
+func graphiteStringMap(rune int) (ret int) {
+  ret, ok := runeMap[rune]
+  if !ok {
+    ret = rune
+  }
+  return
+}
+
 func readXmlFromFile(in io.Reader) (gmeta GangliaXml, err os.Error) {
   p := xml.NewParser(in)
   p.CharsetReader = CharsetReader
 
   gmeta = GangliaXml{}
   err = p.Unmarshal(&gmeta, nil)
-  return
-}
-
-func graphiteStringMap(rune int) (ret int) {
-  if rune == 46 { // 46 == '.'
-    ret = 95 // 95 == '_'
-  } else { ret = rune }
   return
 }
 
