@@ -14,25 +14,25 @@ import (
 
 type GangliaXml struct {
   XMLName xml.Name "GANGLIA_XML"
-  Version string "attr"
-  Source  string "attr"
+  /* Version string "attr"*/
+  /* Source  string "attr"*/
   Grid []Grid
   Cluster []Cluster
 }
 
 type Grid struct {
   XMLName   xml.Name  "GRID"
-  Name      string    "attr"
-  Authority string    "attr"
-  Localtime string    "attr"
+  /* Name      string    "attr"*/
+  /* Authority string    "attr"*/
+  /* Localtime string    "attr"*/
   Cluster   []Cluster
 }
 
 type Cluster struct {
   XMLName xml.Name
-  Name    string "attr"
-  LocalTime string "attr"
-  Owner string "attr"
+  /* Name    string "attr"*/
+  /* LocalTime string "attr"*/
+  /* Owner string "attr"*/
   Host []Host
 }
 
@@ -40,12 +40,12 @@ type Host struct {
   XMLName xml.Name "HOST"
   Name string "attr"
   Ip string "attr"
-  Reported string "attr"
-  TN string "attr"
-  TMax string "attr"
-  DMax string "attr"
-  Location string "attr"
-  Gmond_Started string "attr"
+  /* Reported string "attr"*/
+  /* TN string "attr"*/
+  /* TMax string "attr"*/
+  /* DMax string "attr"*/
+  /* Location string "attr"*/
+  /* Gmond_Started string "attr"*/
   Metric []Metric
 }
 
@@ -71,6 +71,7 @@ type ExtraElement struct {
 var ganglia_addr = flag.String("ganglia_addr", "localhost:8649", "ganglia address")
 var carbon_addr = flag.String("carbon_addr", "localhost:2003", "carbon address")
 var metric_prefix = flag.String("prefix", "ggg.", "prefix for metric names")
+var timestamp = time.Seconds()
 
 var runeMap = map[int]int {
   46: 95, // '.' -> '_'
@@ -121,7 +122,7 @@ func printHostMetrics(out io.Writer, h Host, ret chan int) {
 
 func printMetric(out io.Writer, host string, m Metric, ret chan int) {
   if m.Type != "string" {
-    fmt.Fprintf(out, "%s%s.%s %s %d\n", *metric_prefix, host, m.Name, m.Val, time.Seconds())
+    fmt.Fprintf(out, "%s%s.%s %s %d\n", *metric_prefix, host, m.Name, m.Val, timestamp)
   }
   ret <- 1
 }
