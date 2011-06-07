@@ -9,6 +9,7 @@ import (
   "flag"
   "net"
   "time"
+  "strings"
 )
 
 type GangliaXml struct {
@@ -80,6 +81,13 @@ func ReadXmlFromFile(in io.Reader) (gmeta GangliaXml, err os.Error) {
   return
 }
 
+func graphiteStringMap(rune int) (ret int) {
+  if rune == 46 { // 46 == '.'
+    ret = 95 // 95 == '_'
+  } else { ret = rune }
+  return
+}
+
 func PrintClusterMetrics(out io.Writer, cl *Cluster, ret chan int) {
   ch := make(chan int)
   log.Print("Reading hosts")
@@ -97,7 +105,7 @@ func PrintHostMetrics(out io.Writer, h Host, ret chan int) {
   ch := make(chan int)
   log.Printf("Reading %s metrics", h.Name)
   for _,m := range h.Metric {
-    go PrintMetric(out, h.Name, m, ch)
+    go PrintMetric(out, strings.Map(graphiteStringMap, h.Name), m, ch)
   }
   // drain the channel
   for _ = range h.Metric {
