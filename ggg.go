@@ -137,25 +137,26 @@ func main() {
 	}
 
 	c := make(chan int)
+  cs := 0
 
 	// dispatch goroutines
 	for _, cl := range gmeta.Cluster {
 		log.Print("Reading clusters")
 		/* log.Printf("Cluster %s: %#v\n", cl.Name, cl)*/
 		go printClusterMetrics(carbon_conn, &cl, c)
+		cs++
 	}
 
 	for _, gr := range gmeta.Grid {
 		for _, cl := range gr.Cluster {
 			go printClusterMetrics(carbon_conn, &cl, c)
-		}
-		// drain the channel for last grid
-		for _ = range gr.Cluster {
-			<-c
+			cs++
 		}
 	}
-	// drain channel for clusters outside grid statements
-	for _ = range gmeta.Cluster {
+
+	// drain channel
+	for cs > 0 {
 		<-c
+		cs--
 	}
 }
