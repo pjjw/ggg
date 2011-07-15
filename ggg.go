@@ -13,59 +13,45 @@ import (
 )
 
 type GangliaXml struct {
-	XMLName xml.Name "GANGLIA_XML"
-	/* Version string "attr"*/
-	/* Source  string "attr"*/
+	XMLName xml.Name `xml:"GANGLIA_XML"`
 	Grid    []Grid
 	Cluster []Cluster
 }
 
 type Grid struct {
-	XMLName xml.Name "GRID"
-	/* Name      string    "attr"*/
-	/* Authority string    "attr"*/
-	/* Localtime string    "attr"*/
+	XMLName xml.Name `xml:"GRID"`
 	Cluster []Cluster
 }
 
 type Cluster struct {
 	XMLName xml.Name
-	/* Name    string "attr"*/
-	/* LocalTime string "attr"*/
-	/* Owner string "attr"*/
 	Host []Host
 }
 
 type Host struct {
-	XMLName xml.Name "HOST"
-	Name    string   "attr"
-	Ip      string   "attr"
-	/* Reported string "attr"*/
-	/* TN string "attr"*/
-	/* TMax string "attr"*/
-	/* DMax string "attr"*/
-	/* Location string "attr"*/
-	/* Gmond_Started string "attr"*/
+	XMLName xml.Name `xml:"HOST"`
+	Name    string   `xml:"attr"`
+	Ip      string   `xml:"attr"`
 	Metric []Metric
 }
 
 type Metric struct {
-	XMLName   xml.Name       "METRIC"
-	Name      string         "attr"
-	Val       string         "attr"
-	Type      string         "attr"
-	Units     string         "attr"
-	TN        string         "attr"
-	TMax      string         "attr"
-	DMax      string         "attr"
-	Slope     string         "attr"
-	ExtraData []ExtraElement "extra_data>extra_element"
+	XMLName   xml.Name       `xml:"METRIC"`
+	Name      string         `xml:"attr"`
+	Val       string         `xml:"attr"`
+	Type      string         `xml:"attr"`
+	Units     string         `xml:"attr"`
+	TN        string         `xml:"attr"`
+	TMax      string         `xml:"attr"`
+	DMax      string         `xml:"attr"`
+	Slope     string         `xml:"attr"`
+	ExtraData []ExtraElement `xml:"extra_data>extra_element"`
 }
 
 type ExtraElement struct {
-	XMLName xml.Name "EXTRA_ELEMENT"
-	Name    string   "attr"
-	Val     string   "attr"
+	XMLName xml.Name `xml:"EXTRA_ELEMENT"`
+	Name    string   `xml:"attr"`
+	Val     string   `xml:"attr"`
 }
 
 var ganglia_addr = flag.String("ganglia_addr", "localhost:8649", "ganglia address")
